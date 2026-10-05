@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZEUS OFFICIAL STORE - MLBB Topup</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #0b0e14; color: #fff; padding: 20px; }
+    .container { max-width: 500px; margin: 0 auto; background: #151a23; padding: 20px; border-radius: 12px; border: 1px solid #232d3f; }
+    h1 { text-align: center; color: #00d2ff; font-size: 22px; margin-bottom: 20px; }
+    .section-title { font-size: 15px; margin: 15px 0 8px; color: #9bb0c1; font-weight: 600; }
+    .id-inputs { display: flex; gap: 10px; }
+    .id-inputs input { width: 50%; padding: 12px; border-radius: 8px; border: 1px solid #2d3848; background: #0f1319; color: #fff; font-size: 14px; outline: none; }
+    .id-inputs input:focus { border-color: #00d2ff; }
+    .packages { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .card { background: #1c2331; border: 2px solid transparent; border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; }
+    .card.selected { border-color: #00d2ff; background: #14283d; }
+    .card .diamonds { font-weight: bold; font-size: 15px; color: #e2e8f0; }
+    .card .price { font-size: 13px; color: #00e676; margin-top: 4px; }
+    .btn-submit { width: 100%; margin-top: 20px; padding: 14px; border: none; border-radius: 8px; background: linear-gradient(90deg, #0072ff, #00d2ff); color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>ZEUS OFFICIAL STORE</h1>
+
+    <div class="section-title">১. প্লেয়ার তথ্য দিন</div>
+    <div class="id-inputs">
+      <input type="text" id="userId" placeholder="User ID" />
+      <input type="text" id="zoneId" placeholder="Zone ID" />
+    </div>
+
+    <div class="section-title">২. প্যাকেজ নির্বাচন করুন</div>
+    <div class="packages">
+      <div class="card" onclick="selectPkg(this, '86 Diamonds', '₹140')">
+        <div class="diamonds">💎 86 Diamonds</div>
+        <div class="price">₹140</div>
+      </div>
+      <div class="card" onclick="selectPkg(this, '172 Diamonds', '₹280')">
+        <div class="diamonds">💎 172 Diamonds</div>
+        <div class="price">₹280</div>
+      </div>
+      <div class="card" onclick="selectPkg(this, '257 Diamonds', '₹420')">
+        <div class="diamonds">💎 257 Diamonds</div>
+        <div class="price">₹420</div>
+      </div>
+      <div class="card" onclick="selectPkg(this, 'Weekly Pass', '₹170')">
+        <div class="diamonds">🎫 Weekly Pass</div>
+        <div class="price">₹170</div>
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="submitOrder()">অর্ডার কনফার্ম করুন</button>
+  </div>
+
+  <script>
+    let selectedItem = null;
+    function selectPkg(el, item, price) {
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedItem = { item, price };
+    }
+
+    function submitOrder() {
+      const uId = document.getElementById('userId').value.trim();
+      const zId = document.getElementById('zoneId').value.trim();
+      if (!uId || !zId) return alert('অনুগ্রহ করে User ID এবং Zone ID লিখুন।');
+      if (!selectedItem) return alert('অনুগ্রহ করে একটি প্যাকেজ নির্বাচন করুন।');
+      alert(`অর্ডার গ্রহণ করা হয়েছে!\nআইডি: ${uId} (${zId})\nপ্যাকেজ: ${selectedItem.item}\nমূল্য: ${selectedItem.price}`);
+    }
+  </script>
+</body>
+</html>
