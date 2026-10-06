@@ -1,151 +1,131 @@
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZEUS OFFICIAL STORE - Instant MLBB Top-up</title>
-  <style>
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: #0b0f19; color: #f8fafc; margin: 0; padding: 16px; display: flex; justify-content: center; }
-    .container { max-width: 480px; width: 100%; background: #131c2e; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    h1 { font-size: 20px; text-align: center; color: #38bdf8; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
-    .subtitle { text-align: center; font-size: 12px; color: #94a3b8; margin-bottom: 20px; }
-    
-    .label { font-size: 13px; font-weight: 600; color: #cbd5e1; margin-top: 14px; margin-bottom: 6px; }
-    .input-group { display: flex; gap: 8px; }
-    input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0b0f19; color: #fff; font-size: 14px; outline: none; }
-    input:focus { border-color: #38bdf8; }
-
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; }
-    .card { background: #1e293b; border: 2px solid transparent; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; }
-    .card.active { border-color: #38bdf8; background: #0f172a; }
-    .card .dia { font-size: 14px; font-weight: bold; color: #f1f5f9; }
-    .card .price { font-size: 13px; color: #38bdf8; margin-top: 4px; }
-
-    .pay-box { background: #0b0f19; border: 1px dashed #334155; border-radius: 8px; padding: 16px; text-align: center; margin-top: 16px; display: none; }
-    .qr-img { width: 180px; height: 180px; margin: 10px auto; display: block; border-radius: 8px; background: #fff; padding: 5px; }
-    
-    button { width: 100%; padding: 14px; border-radius: 8px; border: none; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 16px; transition: 0.2s; }
-    .btn-pay { background: #0284c7; color: #fff; }
-    .btn-pay:hover { background: #0369a1; }
-    .btn-confirm { background: #16a34a; color: #fff; }
-    
-    .alert { padding: 10px; border-radius: 6px; font-size: 13px; margin-top: 12px; text-align: center; display: none; }
-    .alert-success { background: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
-  </style>
-</head>
-<body>
-
-<div class="container">
-  <h1>⚡ ZEUS OFFICIAL STORE</h1>
-  <p class="subtitle">Mobile Legends Instant Automated Top-up</p>
-
-  <!-- Step 1: User IDs -->
-  <div class="label">১. আপনার MLBB তথ্য দিন</div>
-  <div class="input-group">
-    <input type="number" id="userId" placeholder="User ID (e.g. 12345678)">
-    <input type="number" id="zoneId" placeholder="Zone ID (e.g. 1234)" style="max-width: 120px;">
+<!-- MLBB ID Input Section -->
+<div class="input-group" style="max-width: 400px; margin: 20px auto; font-family: sans-serif;">
+  <label style="font-weight: bold; display: block; margin-bottom: 5px;">Player Verification</label>
+  
+  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+    <input 
+      type="text" 
+      id="userIdInput" 
+      placeholder="User ID (e.g. 12345678)" 
+      style="flex: 2; padding: 10px; border-radius: 6px; border: 1px solid #ccc;"
+    >
+    <input 
+      type="text" 
+      id="zoneIdInput" 
+      placeholder="Zone ID (e.g. 1234)" 
+      style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc;"
+    >
   </div>
 
-  <!-- Step 2: Diamond Packages -->
-  <div class="label">২. ডায়মন্ড প্যাকেজ নির্বাচন করুন</div>
-  <div class="grid">
-    <div class="card" onclick="selectPkg(this, '86 Diamonds', 140, 'pkg_86')">
-      <div class="dia">💎 86 Diamonds</div>
-      <div class="price">₹140</div>
-    </div>
-    <div class="card" onclick="selectPkg(this, '172 Diamonds', 280, 'pkg_172')">
-      <div class="dia">💎 172 Diamonds</div>
-      <div class="price">₹280</div>
-    </div>
-    <div class="card" onclick="selectPkg(this, '257 Diamonds', 420, 'pkg_257')">
-      <div class="dia">💎 257 Diamonds</div>
-      <div class="price">₹420</div>
-    </div>
-    <div class="card" onclick="selectPkg(this, 'Weekly Pass', 170, 'pkg_wdp')">
-      <div class="dia">🎫 Weekly Pass</div>
-      <div class="price">₹170</div>
-    </div>
-  </div>
+  <!-- Verification Message / In-Game Name -->
+  <div id="idStatus" style="font-size: 14px; margin-bottom: 15px; font-weight: 500;"></div>
 
-  <!-- Continue to Payment Button -->
-  <button class="btn-pay" id="payBtn" onclick="generatePayment()">পেমেন্ট অপশনে যান</button>
-
-  <!-- Step 3: Automated Payment Section -->
-  <div class="pay-box" id="paySection">
-    <div style="font-size: 13px; color: #94a3b8;">যেকোনো UPI (FamPay/GPay/PhonePe) দিয়ে স্ক্যান করুন</div>
-    <img id="upiQr" class="qr-img" src="" alt="UPI QR">
-    <div style="font-weight: bold; color: #38bdf8; font-size: 16px;" id="payAmount">₹0</div>
-
-    <div class="label" style="text-align: left; margin-top: 14px;">পেমেন্ট শেষে ১২ সংখ্যার UTR / Ref No দিন:</div>
-    <input type="text" id="utrNumber" placeholder="১২ সংখ্যার UTR নাম্বার লিখুন">
-    <button class="btn-confirm" onclick="processAutoTopup()">ডায়মন্ড ভেরিফাই ও সংগ্রহ করুন</button>
-  </div>
-
-  <div id="statusAlert" class="alert alert-success"></div>
+  <!-- Order Submit Button -->
+  <button 
+    id="orderBtn" 
+    onclick="submitOrder()" 
+    disabled 
+    style="width: 100%; padding: 12px; background-color: #777; color: white; border: none; border-radius: 6px; cursor: not-allowed; font-size: 16px; font-weight: bold;"
+  >
+    Confirm Order
+  </button>
 </div>
 
 <script>
-  // আপনার FamPay UPI ID (এখানে আপনার সঠিক UPI ID দিন)
-  const FAMPAY_UPI_ID = "zeus@fampay"; 
+const userIdInput = document.getElementById("userIdInput");
+const zoneIdInput = document.getElementById("zoneIdInput");
+const idStatus = document.getElementById("idStatus");
+const orderBtn = document.getElementById("orderBtn");
 
-  let currentPkg = null;
+let verifiedUsername = null;
 
-  function selectPkg(el, name, price, code) {
-    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    currentPkg = { name, price, code };
+// ইউজার দুটি ফিল্ড টাইপ করে শেষ করলে স্বয়ংক্রিয়ভাবে নাম চেক করবে
+userIdInput.addEventListener("blur", checkPlayerId);
+zoneIdInput.addEventListener("blur", checkPlayerId);
+
+async function checkPlayerId() {
+  const userId = userIdInput.value.trim();
+  const zoneId = zoneIdInput.value.trim();
+
+  // দুটি ফিল্ডেই ইনপুট না থাকলে কল করবে না
+  if (!userId || !zoneId) {
+    idStatus.innerHTML = "";
+    disableOrderBtn();
+    return;
   }
 
-  function generatePayment() {
-    const uid = document.getElementById('userId').value.trim();
-    const zid = document.getElementById('zoneId').value.trim();
+  idStatus.style.color = "#0070f3";
+  idStatus.innerHTML = "⏳ Verifying account...";
 
-    if (!uid || !zid) return alert("দয়া করে আপনার User ID এবং Zone ID লিখুন!");
-    if (!currentPkg) return alert("একটি ডায়মন্ড প্যাকেজ বেছে নিন!");
+  try {
+    const res = await fetch("/api/check-id", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, zoneId })
+    });
 
-    // ডায়নামিক UPI QR কোড তৈরি
-    const upiUrl = `upi://pay?pa=${FAMPAY_UPI_ID}&pn=ZEUS_STORE&am=${currentPkg.price}&cu=INR&tn=MLBB_${uid}`;
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURI(upiUrl)}`;
+    const data = await res.json();
 
-    document.getElementById('upiQr').src = qrUrl;
-    document.getElementById('payAmount').innerText = `মোট পরিশোধ: ₹${currentPkg.price}`;
-    document.getElementById('paySection').style.display = 'block';
-    document.getElementById('payBtn').style.display = 'none';
+    if (res.ok && data.success) {
+      verifiedUsername = data.username;
+      idStatus.style.color = "#00a854";
+      idStatus.innerHTML = `✓ Username: <strong>${data.username}</strong>`;
+      enableOrderBtn();
+    } else {
+      verifiedUsername = null;
+      idStatus.style.color = "#f5222d";
+      idStatus.innerHTML = `✕ ${data.message || "Invalid User ID or Zone ID!"}`;
+      disableOrderBtn();
+    }
+  } catch (err) {
+    idStatus.style.color = "#f5222d";
+    idStatus.innerHTML = "✕ Verification service unavailable.";
+    disableOrderBtn();
+  }
+}
+
+function enableOrderBtn() {
+  orderBtn.disabled = false;
+  orderBtn.style.backgroundColor = "#28a745";
+  orderBtn.style.cursor = "pointer";
+}
+
+function disableOrderBtn() {
+  orderBtn.disabled = true;
+  orderBtn.style.backgroundColor = "#777";
+  orderBtn.style.cursor = "not-allowed";
+}
+
+async function submitOrder() {
+  if (!verifiedUsername) {
+    alert("Please enter a valid Player ID & Zone ID first!");
+    return;
   }
 
-  async function processAutoTopup() {
-    const utr = document.getElementById('utrNumber').value.trim();
-    const uid = document.getElementById('userId').value.trim();
-    const zid = document.getElementById('zoneId').value.trim();
+  const orderData = {
+    userId: "zeus-customer-01",
+    productId: "mlbb_pass",
+    playerId: userIdInput.value.trim(),
+    zoneId: zoneIdInput.value.trim(),
+    playerName: verifiedUsername
+  };
 
-    if (utr.length < 10) return alert("সঠিক ১২ সংখ্যার UTR নাম্বার দিন!");
+  try {
+    const res = await fetch("/api/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData)
+    });
 
-    const alertBox = document.getElementById('statusAlert');
-    alertBox.style.display = 'block';
-    alertBox.innerText = "⏳ পেমেন্ট ভেরিফাই করা হচ্ছে এবং Busan API-তে অর্ডার পাঠানো হচ্ছে...";
+    const data = await res.json();
 
-    // ক্লাউড ব্যাকএন্ডের কাছে অটোমেটিক রিকোয়েস্ট পাঠানো
-    const orderData = {
-      userId: uid,
-      zoneId: zid,
-      package: currentPkg.code,
-      utr: utr,
-      amount: currentPkg.price,
-      time: new Date().toISOString()
-    };
-
-    // আপনার ব্রাউজার স্টোরেজেও ব্যাকআপ রাখা
-    const localOrders = JSON.parse(localStorage.getItem('zeus_orders') || '[]');
-    localOrders.unshift(orderData);
-    localStorage.setItem('zeus_orders', JSON.stringify(localOrders));
-
-    // অর্ডার সম্পূর্ণ হওয়ার বার্তা
-    setTimeout(() => {
-      alertBox.innerText = `✅ পেমেন্ট রিসিভ হয়েছে! অর্ডারটি Busan API-তে সাবমিট করা হয়েছে। ১ মিনিটের মধ্যে ডায়মন্ড পৌঁছে যাবে।`;
-    }, 1500);
+    if (res.ok) {
+      alert("Order Successful for " + verifiedUsername + "!");
+    } else {
+      alert("Order Failed: " + (data.error || "Could not complete order."));
+    }
+  } catch (err) {
+    alert("Server error processing order.");
   }
+}
 </script>
-
-</body>
-</html>
