@@ -1,205 +1,159 @@
-
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | Zeus Official Store</title>
+  <title>Zeus Topup - Store Admin</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #0b0f19; color: #f1f5f9; padding: 20px; }
-    
-    /* Login Card */
-    .login-container {
-      max-width: 380px;
-      margin: 80px auto;
-      background: #1e293b;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      border: 1px solid #334155;
-      text-align: center;
+    :root {
+      --bg-dark: #000000;
+      --card-bg: #111111;
+      --card-inner: #191919;
+      --border-color: #262626;
+      --accent-yellow: #fde047;
+      --accent-yellow-hover: #facc15;
+      --text-main: #ffffff;
+      --text-muted: #888888;
+      --badge-bg: #222222;
+      --danger: #ef4444;
+      --success: #22c55e;
     }
-    .login-container h2 { margin-bottom: 20px; font-size: 22px; color: #38bdf8; }
-    .input-box {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #475569;
-      background: #0f172a;
-      color: #fff;
-      font-size: 15px;
-      margin-bottom: 15px;
-      outline: none;
-    }
-    .input-box:focus { border-color: #38bdf8; }
-    .btn-submit {
-      width: 100%;
-      padding: 12px;
-      background: #0284c7;
-      color: #fff;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background 0.2s;
-    }
-    .btn-submit:hover { background: #0369a1; }
 
-    /* Admin Panel */
-    .dashboard { display: none; max-width: 900px; margin: 20px auto; }
-    .dash-header {
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Top Nav */
+    .top-header {
+      background: #080808;
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #334155;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .logout-btn {
-      background: #e11d48;
+    .brand-group { display: flex; align-items: center; gap: 12px; }
+    .store-badge {
+      background: #272218;
+      border: 1px solid #4a3b20;
+      color: #fde047;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .header-titles h1 { font-size: 15px; font-weight: 600; color: #fff; }
+    .header-titles span { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: var(--text-muted); }
+    .menu-btn {
+      background: #1a1a1a;
+      border: 1px solid var(--border-color);
       color: #fff;
-      padding: 8px 16px;
-      border-radius: 6px;
-      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
       cursor: pointer;
-      font-weight: bold;
-    }
-    .orders-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #1e293b;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-    .orders-table th, .orders-table td {
-      padding: 14px 16px;
-      text-align: left;
-      border-bottom: 1px solid #334155;
       font-size: 14px;
     }
-    .orders-table th { background: #0f172a; color: #94a3b8; font-weight: 600; }
-    .status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: bold;
+
+    /* Layout */
+    .admin-wrapper { display: flex; flex: 1; position: relative; }
+
+    /* Slide Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 270px;
+      height: 100%;
+      background: #050505;
+      border-right: 1px solid var(--border-color);
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: left 0.25s ease-in-out;
+      z-index: 200;
+      overflow-y: auto;
     }
-    .badge-pending { background: #854d0e; color: #fef08a; }
-    .badge-done { background: #166534; color: #bbf7d0; }
-    .action-btn {
-      background: #10b981;
+    .sidebar.open { left: 0; }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 150;
+    }
+    .sidebar-overlay.active { display: block; }
+    .sidebar-close-btn {
+      align-self: flex-end;
+      background: #191919;
+      border: 1px solid var(--border-color);
       color: #fff;
-      border: none;
-      padding: 8px 14px;
+      padding: 6px 10px;
       border-radius: 6px;
       cursor: pointer;
-      font-weight: bold;
-      transition: opacity 0.2s;
+      margin-bottom: 12px;
     }
-    .action-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-  </style>
-</head>
-<body>
-
-  <!-- লগইন সেকশন -->
-  <div id="loginCard" class="login-container">
-    <h2>Admin Login</h2>
-    <input type="password" id="pinInput" class="input-box" placeholder="পাসওয়ার্ড লিখুন">
-    <button class="btn-submit" onclick="login()">প্রবেশ করুন</button>
-  </div>
-
-  <!-- অ্যাডমিন ড্যাশবোর্ড সেকশন -->
-  <div id="dashboardSection" class="dashboard">
-    <div class="dash-header">
-      <div>
-        <h2 style="color: #38bdf8;">ZEUS Admin Dashboard</h2>
-        <p style="font-size: 13px; color: #94a3b8;">অর্ডার ম্যানেজমেন্ট ও কাস্টমার তালিকা</p>
-      </div>
-      <button class="logout-btn" onclick="logout()">লগআউট</button>
-    </div>
-
-    <table class="orders-table">
-      <thead>
-        <tr>
-          <th>User ID</th>
-          <th>Zone ID</th>
-          <th>প্যাকেজ</th>
-          <th>স্ট্যাটাস</th>
-          <th>অ্যাকশন</th>
-        </tr>
-      </thead>
-      <tbody id="ordersBody">
-        <!-- অর্ডারের রো এখানে লোড হবে -->
-      </tbody>
-    </table>
-  </div>
-
-  <script>
-    // ডিফল্ট পাসওয়ার্ড: 1234 (প্রয়োজনে পরিবর্তন করে নিতে পারেন)
-    const ADMIN_PASS = "1234";
-
-    function login() {
-      const enteredPin = document.getElementById("pinInput").value;
-      if (enteredPin === ADMIN_PASS) {
-        document.getElementById("loginCard").style.display = "none";
-        document.getElementById("dashboardSection").style.display = "block";
-        loadDashboardData();
-      } else {
-        alert("ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।");
-      }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
     }
-
-    function logout() {
-      location.reload();
+    .nav-item:hover, .nav-item.active {
+      background: #191612;
+      color: #fff;
     }
+    .nav-item.active { font-weight: 600; color: #fde047; }
 
-    function loadDashboardData() {
-      // ডেমো অর্ডার তালিকা (পরবর্তীতে ডাটাবেস যোগ হলে স্বয়ংক্রিয়ভাবে আসবে)
-      const sampleOrders = [
-        { id: 1, userId: "62548912", zoneId: "2105", item: "Weekly Diamond Pass", status: "Pending" },
-        { id: 2, userId: "10984712", zoneId: "4012", item: "86 Diamonds", status: "Pending" }
-      ];
+    /* Main Content */
+    .main-body { flex: 1; padding: 20px 16px; max-width: 760px; margin: 0 auto; width: 100%; }
 
-      const tbody = document.getElementById("ordersBody");
-      tbody.innerHTML = "";
+    /* Tab Sections */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
-      sampleOrders.forEach(order => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td><strong>${order.userId}</strong></td>
-          <td>(${order.zoneId})</td>
-          <td>${order.item}</td>
-          <td><span id="badge-${order.id}" class="status-badge badge-pending">${order.status}</span></td>
-          <td>
-            <button id="btn-${order.id}" class="action-btn" onclick="processOrder(${order.id}, '${order.userId}', '${order.zoneId}')">
-              Send Diamond
-            </button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
+    /* Cards */
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
     }
-
-    function processOrder(orderId, userId, zoneId) {
-      const btn = document.getElementById(`btn-${orderId}`);
-      const badge = document.getElementById(`badge-${orderId}`);
-
-      btn.disabled = true;
-      btn.innerText = "পাঠানো হচ্ছে...";
-
-      // পরবর্তীতে প্রোভাইডারের API কল এই অংশে বসবে
-      setTimeout(() => {
-        btn.innerText = "Done ✅";
-        btn.style.background = "#475569";
-        badge.innerText = "Completed";
-        badge.className = "status-badge badge-done";
-        alert(`User ID: ${userId} (${zoneId})-এ সফলভাবে ডায়মন্ড পাঠানো হয়েছে!`);
-      }, 1500);
+    .card-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
     }
-  </script>
-</body>
-</html>
+    .card-title-group { display: flex; align-items: center; gap: 10px; }
+    .card-icon {
+      background: #222;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+    }
+    .card-titles h3 { font-size: 15px; font-weight: 600; }
+    .card-titles p { font-size: 12px; color: var(--text-muted); }
+    .pill-badge {
+      background: var(--badge-bg);
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: 20px;
+      color: var(--text-muted);
+      border: 1px solid #333;
+    }
+    .pill-badge.live { color: #86efac; border-color: #166534; background: #064e3b; }
+
+    /* Form Fields */
+    .field-label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px
