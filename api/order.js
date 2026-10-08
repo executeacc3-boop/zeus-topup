@@ -1,26 +1,44 @@
-async function submitOrder() {
-  const orderData = {
-    userId: "customer-unique-id",       // কাস্টমারের ইউজার আইডি
-    productId: "prod_mlbb_pass",        // সিলেক্ট করা প্রোডাক্টের আইডি
-    playerId: document.getElementById("playerIdInput").value, // MLBB User ID
-    zoneId: document.getElementById("zoneIdInput").value      // MLBB Zone ID
-  };
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method Not Allowed' });
+  }
+
+  const { userId, zoneId, packageId, txnId } = req.body;
+
+  if (!txnId || !userId || !zoneId || !packageId) {
+    return res.status(400).json({ success: false, message: 'Missing order parameters' });
+  }
+
+  const BUSAN_API_URL = process.env.BUSAN_API_URL || "https://busanofficial.com/api/order";
+  const BUSAN_API_KEY = process.env.BUSAN_API_KEY || "YOUR_BUSAN_API_KEY";
 
   try {
-    const res = await fetch("/api/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData)
+    const response = await fetch(BUSAN_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${BUSAN_API_KEY}`
+      },
+      body: JSON.stringify({
+        api_key: BUSAN_API_KEY,
+        user_id: userId,
+        zone_id: zoneId,
+        product_id: packageId,
+        ref_id: txnId
+      })
     });
 
-    const data = await res.json();
+    const result = await response.json();
 
-    if (res.ok) {
-      alert("Success: " + data.message);
-    } else {
-      alert("Error: " + data.error);
-    }
+    return res.status(200).json({
+      success: true,
+      message: 'Recharge successful!',
+      data: result
+    });
   } catch (error) {
-    alert("Server error occurred while submitting order.");
+    return res.status(500).json({
+      success: false,
+      message: 'API Execution Failed: ' + error.message
+    });
   }
 }
