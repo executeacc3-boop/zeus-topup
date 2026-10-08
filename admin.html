@@ -3,87 +3,135 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zeus Topup - Complete Store Admin</title>
+  <title>Zeus Topup - Store Admin</title>
   <style>
     :root {
       --bg: #0b0c0e;
       --card-bg: #141518;
-      --card-border: #23252a;
-      --text-white: #f5f5f7;
-      --text-muted: #8b8e98;
+      --border: #23252a;
       --gold: #f4e4b5;
-      --gold-hover: #e6d39c;
       --green: #22c55e;
-      --danger: #ef4444;
-      --blue: #3b82f6;
+      --text: #ffffff;
+      --muted: #8b8e98;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 50px; }
+
+    /* Login */
+    #loginBox { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; }
+    .inp { width: 100%; background: #08090a; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 8px; margin: 8px 0 16px 0; outline: none; }
+    .btn-gold { background: var(--gold); color: #000; font-weight: 700; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; }
+
+    /* Dashboard */
+    #adminPanel { display: none; }
+    header { background: #101115; border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+    .btn-icon { background: #1c1e24; border: 1px solid var(--border); color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 16px; }
+    
+    /* Side Drawer */
+    .drawer { position: fixed; top: 0; left: -280px; width: 260px; height: 100%; background: #08090b; border-right: 1px solid var(--border); transition: 0.3s; z-index: 100; padding: 20px; }
+    .drawer.open { left: 0; }
+    .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 90; }
+    .backdrop.open { display: block; }
+    .menu-item { padding: 12px; color: var(--muted); border-radius: 8px; cursor: pointer; margin-bottom: 6px; }
+    .menu-item.active, .menu-item:hover { background: #1a1b22; color: #fff; }
+
+    /* Content */
+    .container { padding: 20px 16px; max-width: 500px; margin: 0 auto; }
+    .box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 14px; }
+    .row { display: flex; justify-content: space-between; align-items: center; }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginBox">
+    <div class="card">
+      <h2 style="text-align:center; margin-bottom: 4px;">⚡ Zeus Admin</h2>
+      <p style="text-align:center; font-size: 13px; color: var(--muted); margin-bottom: 20px;">Control Dashboard</p>
+      
+      <label style="font-size: 13px;">Gmail ID</label>
+      <input type="email" id="uEmail" class="inp" placeholder="admin@gmail.com">
+      
+      <label style="font-size: 13px;">Password</label>
+      <input type="password" id="uPass" class="inp" placeholder="123456">
+
+      <button class="btn-gold" onclick="login()">Login</button>
+      <div id="err" style="color:#ef4444; font-size:12px; text-align:center; margin-top:10px; display:none;">Email ba Password bhul!</div>
+    </div>
+  </div>
+
+  <!-- ADMIN MAIN PANEL -->
+  <div id="adminPanel">
+    <header>
+      <button class="btn-icon" onclick="openMenu(true)">☰</button>
+      <b style="color:var(--gold);">Zeus Topup Admin</b>
+      <button onclick="logout()" style="background:none; border:1px solid #ef4444; color:#ef4444; padding:5px 10px; border-radius:6px; cursor:pointer;">Logout</button>
+    </header>
+
+    <div id="backdrop" class="backdrop" onclick="openMenu(false)"></div>
+    <div id="drawer" class="drawer">
+      <div class="row" style="margin-bottom: 20px;">
+        <h3>Menu</h3>
+        <button onclick="openMenu(false)" style="background:none; border:none; color:#fff; font-size:18px;">✕</button>
+      </div>
+      <div class="menu-item active" onclick="showTab('orders', this)">📦 Orders</div>
+      <div class="menu-item" onclick="showTab('payments', this)">₹ Payments (UPI)</div>
+      <div class="menu-item" onclick="showTab('apis', this)">⚙️ Provider API</div>
+    </div>
+
+    <div class="container">
+      
+      <!-- ORDERS TAB -->
+      <div id="tab-orders">
+        <h3 style="margin-bottom: 12px;">Customer Orders</h3>
+        <div id="orderList" class="box" style="text-align:center; color:var(--muted);">Kono notun order nei</div>
+      </div>
+
+      <!-- PAYMENTS TAB -->
+      <div id="tab-payments" style="display:none;">
+        <h3 style="margin-bottom: 12px;">₹ Payment Settings</h3>
+        <div class="box">
+          <label style="font-size: 13px;">Your UPI ID</label>
+          <input type="text" id="upiId" class="inp" placeholder="9832580722@ptyest">
+          <button class="btn-gold" onclick="saveUpi()">Save UPI</button>
+        </div>
+      </div>
+
+      <!-- APIS TAB -->
+      <div id="tab-apis" style="display:none;">
+        <h3 style="margin-bottom: 12px;">⚙️ Provider API</h3>
+        <div class="box">
+          <h4>🔑 Busan Official API</h4>
+          <input type="password" id="apiKey" class="inp" placeholder="Busan API Key din" style="margin-top:10px;">
+          <button class="btn-gold" onclick="saveApi()">Save API Key</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function login() {
+      const e = document.getElementById('uEmail').value.trim();
+      const p = document.getElementById('uPass').value.trim();
+      if(e === 'admin@gmail.com' && p === '123456') {
+        sessionStorage.setItem('isLogged', 'true');
+        startDashboard();
+      } else {
+        document.getElementById('err').style.display = 'block';
+      }
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text-white); min-height: 100vh; padding-bottom: 50px; }
+    function logout() {
+      sessionStorage.clear();
+      location.reload();
+    }
 
-    /* Login Screen */
-    #loginBox { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-    .login-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 28px; width: 100%; max-width: 380px; box-shadow: 0 10px 35px rgba(0,0,0,0.8); }
-    .login-title { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 4px; }
-    .login-sub { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 24px; }
-    .input-group { margin-bottom: 16px; }
-    .input-group label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px; }
-    .input-group input { width: 100%; padding: 12px 14px; background: #08090a; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
-    .input-group input:focus { border-color: var(--gold); }
-    .btn-gold { background: var(--gold); color: #000; font-weight: 700; border: none; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-size: 14px; transition: 0.2s; }
-    .btn-gold:hover { background: var(--gold-hover); }
+    function startDashboard() {
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      loadData();
+    }
 
-    /* Admin Navigation */
-    #adminPanel { display: none; }
-    header { background: #0f1013; border-bottom: 1px solid var(--card-border); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .icon-btn { background: #1c1e24; border: 1px solid var(--card-border); color: #fff; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 15px; }
-    .store-brand { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
-    .logout-btn { background: transparent; border: 1px solid #332024; color: #f87171; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; }
-
-    /* Side Drawer */
-    .drawer { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: #08090b; border-right: 1px solid var(--card-border); transition: 0.3s; z-index: 100; overflow-y: auto; padding: 20px 14px; }
-    .drawer.open { left: 0; }
-    .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 0 6px; }
-    .drawer-title { font-size: 16px; font-weight: 700; }
-    .drawer-sub { font-size: 11px; color: var(--text-muted); }
-    .close-btn { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
-    .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; color: var(--text-muted); font-size: 14px; margin-bottom: 4px; cursor: pointer; font-weight: 500; }
-    .menu-item:hover, .menu-item.active { background: #1a1b22; color: #fff; }
-    .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: none; z-index: 90; }
-    .backdrop.open { display: block; }
-
-    /* Main Container */
-    .content { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
-    .page-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
-    .page-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; }
-
-    /* Cards */
-    .card-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 20px; margin-bottom: 16px; }
-    .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-    .badge-status { font-size: 11px; padding: 3px 8px; border-radius: 20px; background: #262933; color: #9ca3af; }
-    .badge-connected { background: #143522; color: #4ade80; }
-
-    /* Switch Style */
-    .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1a1c23; }
-    .switch-row:last-child { border-bottom: none; }
-    .switch-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-    .switch-info p { font-size: 12px; color: var(--text-muted); }
-    .toggle { width: 44px; height: 24px; appearance: none; background: #262933; border-radius: 20px; position: relative; outline: none; cursor: pointer; transition: 0.3s; }
-    .toggle:checked { background: var(--gold); }
-    .toggle:before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; top: 3px; left: 3px; background: #fff; transition: 0.3s; }
-    .toggle:checked:before { transform: translateX(20px); background: #000; }
-
-    .inner-input { width: 100%; background: #08090a; border: 1px solid var(--card-border); color: #fff; border-radius: 12px; padding: 12px 14px; font-size: 14px; margin-top: 8px; outline: none; }
-    .inner-input:focus { border-color: var(--gold); }
-
-    /* Stats Grid */
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
-    .stat-card { background: #0f1115; border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; text-align: center; }
-    .stat-val { font-size: 20px; font-weight: 800; color: var(--gold); margin-top: 4px; }
-    .stat-lbl { font-size: 12px; color: var(--text-muted); }
-
-    /* Order Card */
-    .order-item { background: #0d0f13; border: 1px solid var(--card-border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
-    .order-top { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 8px; font-size: 14px; }
-    .btn-action-green { width: 100%; background: var(--green); color:
+    function openMenu(s
