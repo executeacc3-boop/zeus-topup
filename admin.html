@@ -3,135 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zeus Topup - Store Admin</title>
+  <title>ZEUS OFFICIAL STORE - Master Admin</title>
   <style>
     :root {
-      --bg: #0b0c0e;
-      --card-bg: #141518;
-      --border: #23252a;
+      --bg: #090a0d;
+      --surface: #12141a;
+      --surface-border: #1f232d;
       --gold: #f4e4b5;
+      --gold-dark: #d8c28b;
       --green: #22c55e;
-      --text: #ffffff;
-      --muted: #8b8e98;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 50px; }
-
-    /* Login */
-    #loginBox { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px; width: 100%; max-width: 360px; }
-    .inp { width: 100%; background: #08090a; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 8px; margin: 8px 0 16px 0; outline: none; }
-    .btn-gold { background: var(--gold); color: #000; font-weight: 700; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; }
-
-    /* Dashboard */
-    #adminPanel { display: none; }
-    header { background: #101115; border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
-    .btn-icon { background: #1c1e24; border: 1px solid var(--border); color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 16px; }
-    
-    /* Side Drawer */
-    .drawer { position: fixed; top: 0; left: -280px; width: 260px; height: 100%; background: #08090b; border-right: 1px solid var(--border); transition: 0.3s; z-index: 100; padding: 20px; }
-    .drawer.open { left: 0; }
-    .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 90; }
-    .backdrop.open { display: block; }
-    .menu-item { padding: 12px; color: var(--muted); border-radius: 8px; cursor: pointer; margin-bottom: 6px; }
-    .menu-item.active, .menu-item:hover { background: #1a1b22; color: #fff; }
-
-    /* Content */
-    .container { padding: 20px 16px; max-width: 500px; margin: 0 auto; }
-    .box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 14px; }
-    .row { display: flex; justify-content: space-between; align-items: center; }
-  </style>
-</head>
-<body>
-
-  <!-- LOGIN SCREEN -->
-  <div id="loginBox">
-    <div class="card">
-      <h2 style="text-align:center; margin-bottom: 4px;">⚡ Zeus Admin</h2>
-      <p style="text-align:center; font-size: 13px; color: var(--muted); margin-bottom: 20px;">Control Dashboard</p>
-      
-      <label style="font-size: 13px;">Gmail ID</label>
-      <input type="email" id="uEmail" class="inp" placeholder="admin@gmail.com">
-      
-      <label style="font-size: 13px;">Password</label>
-      <input type="password" id="uPass" class="inp" placeholder="123456">
-
-      <button class="btn-gold" onclick="login()">Login</button>
-      <div id="err" style="color:#ef4444; font-size:12px; text-align:center; margin-top:10px; display:none;">Email ba Password bhul!</div>
-    </div>
-  </div>
-
-  <!-- ADMIN MAIN PANEL -->
-  <div id="adminPanel">
-    <header>
-      <button class="btn-icon" onclick="openMenu(true)">☰</button>
-      <b style="color:var(--gold);">Zeus Topup Admin</b>
-      <button onclick="logout()" style="background:none; border:1px solid #ef4444; color:#ef4444; padding:5px 10px; border-radius:6px; cursor:pointer;">Logout</button>
-    </header>
-
-    <div id="backdrop" class="backdrop" onclick="openMenu(false)"></div>
-    <div id="drawer" class="drawer">
-      <div class="row" style="margin-bottom: 20px;">
-        <h3>Menu</h3>
-        <button onclick="openMenu(false)" style="background:none; border:none; color:#fff; font-size:18px;">✕</button>
-      </div>
-      <div class="menu-item active" onclick="showTab('orders', this)">📦 Orders</div>
-      <div class="menu-item" onclick="showTab('payments', this)">₹ Payments (UPI)</div>
-      <div class="menu-item" onclick="showTab('apis', this)">⚙️ Provider API</div>
-    </div>
-
-    <div class="container">
-      
-      <!-- ORDERS TAB -->
-      <div id="tab-orders">
-        <h3 style="margin-bottom: 12px;">Customer Orders</h3>
-        <div id="orderList" class="box" style="text-align:center; color:var(--muted);">Kono notun order nei</div>
-      </div>
-
-      <!-- PAYMENTS TAB -->
-      <div id="tab-payments" style="display:none;">
-        <h3 style="margin-bottom: 12px;">₹ Payment Settings</h3>
-        <div class="box">
-          <label style="font-size: 13px;">Your UPI ID</label>
-          <input type="text" id="upiId" class="inp" placeholder="9832580722@ptyest">
-          <button class="btn-gold" onclick="saveUpi()">Save UPI</button>
-        </div>
-      </div>
-
-      <!-- APIS TAB -->
-      <div id="tab-apis" style="display:none;">
-        <h3 style="margin-bottom: 12px;">⚙️ Provider API</h3>
-        <div class="box">
-          <h4>🔑 Busan Official API</h4>
-          <input type="password" id="apiKey" class="inp" placeholder="Busan API Key din" style="margin-top:10px;">
-          <button class="btn-gold" onclick="saveApi()">Save API Key</button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <script>
-    function login() {
-      const e = document.getElementById('uEmail').value.trim();
-      const p = document.getElementById('uPass').value.trim();
-      if(e === 'admin@gmail.com' && p === '123456') {
-        sessionStorage.setItem('isLogged', 'true');
-        startDashboard();
-      } else {
-        document.getElementById('err').style.display = 'block';
-      }
+      --red: #ef4444;
+      --text: #f8fafc;
+      --muted: #848995;
     }
 
-    function logout() {
-      sessionStorage.clear();
-      location.reload();
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 60px; }
+
+    /* AUTH LOCK OVERLAY */
+    #lockScreen {
+      position: fixed; inset: 0; background: var(--bg); display: flex;
+      justify-content: center; align-items: center; z-index: 9999; padding: 20px;
+    }
+    .lock-card {
+      background: var(--surface); border: 1px solid var(--surface-border);
+      border-radius: 20px; padding: 30px; width: 100%; max-width: 360px;
+      text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+    }
+    .lock-logo { font-size: 28px; margin-bottom: 8px; }
+    .lock-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .lock-card p { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+    .pin-input {
+      width: 100%; background: #060709; border: 1px solid var(--surface-border);
+      color: #fff; padding: 14px; font-size: 16px; border-radius: 12px;
+      text-align: center; letter-spacing: 4px; margin-bottom: 14px; outline: none;
+    }
+    .pin-input:focus { border-color: var(--gold); }
+    .btn-gold {
+      width: 100%; background: var(--gold); color: #000; font-weight: 700;
+      border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 14px;
+      transition: 0.2s;
+    }
+    .btn-gold:hover { background: var(--gold-dark); }
+
+    /* HEADER */
+    header {
+      background: #0d0f14; border-bottom: 1px solid var(--surface-border);
+      padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; color: var(--gold); }
+    .btn-logout {
+      background: none; border: 1px solid #3b1d24; color: var(--red);
+      padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
     }
 
-    function startDashboard() {
-      document.getElementById('loginBox').style.display = 'none';
-      document.getElementById('adminPanel').style.display = 'block';
-      loadData();
+    /* TOP NAVIGATION TABS */
+    .nav-bar {
+      display: flex; gap: 8px; padding: 14px 16px; overflow-x: auto;
+      max-width: 600px; margin: 0 auto; scrollbar-width: none;
     }
+    .nav-pill {
+      background: var(--surface); border: 1px solid var(--surface-border);
+      color: var(--muted); padding: 9px 16px; border-radius: 10px;
+      font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .nav-pill.active { background: #1c202a; border-color: var(--gold); color: #fff; }
 
-    function openMenu(s
+    /* CONTENT WRAPPER */
+    .container { max-width: 600px; margin: 0 auto; padding: 0 16px; }
+
+    /* CARDS & UI */
+    .card {
+      background: var(--surface); border: 1px solid var(--surface-border);
+      border-radius: 16px; padding: 18px; margin-bottom: 14px;
+    }
+    .card-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .card-subtitle { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+
+    /* STATS GRID */
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+    .stat-tile {
+      background: #0a0b0f; border: 1px solid var(--surface-border);
+      border-radius: 12px; padding: 14px; text-align: center;
+    }
+    .stat-val { font-size: 20px; font-weight: 800; color: var(--gold); margin-top: 4px; }
+    .stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; }
+
+    /* FORM ELEMENTS */
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .field input {
+      width: 100%; background: #060709; border: 1px solid var(--surface-border);
+      color: #fff; padding: 12px 14px; border-radius: 10px; font-size: 14px; outline: none;
+    }
+    .field input:focus { border-color: var(--gold); }
+
+    /* TOGGLE SWITCH ROW */
+    .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
+    .switch-desc h4 { font-size: 14px; font-weight: 600; }
+    .switch-desc p { font-size: 12px; color: var(--muted); }
+    .toggle {
+      width: 44px; height: 24px; appearance: none; background: #262933;
+      border-radius: 20px; position: relative; outline: none
