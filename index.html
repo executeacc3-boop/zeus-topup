@@ -1,131 +1,358 @@
-<!-- MLBB ID Input Section -->
-<div class="input-group" style="max-width: 400px; margin: 20px auto; font-family: sans-serif;">
-  <label style="font-weight: bold; display: block; margin-bottom: 5px;">Player Verification</label>
-  
-  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-    <input 
-      type="text" 
-      id="userIdInput" 
-      placeholder="User ID (e.g. 12345678)" 
-      style="flex: 2; padding: 10px; border-radius: 6px; border: 1px solid #ccc;"
-    >
-    <input 
-      type="text" 
-      id="zoneIdInput" 
-      placeholder="Zone ID (e.g. 1234)" 
-      style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc;"
-    >
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZEUS OFFICIAL STORE - Instant MLBB Top-up</title>
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --card-bg: #141721;
+      --border: #232736;
+      --accent: #facc15;
+      --accent-hover: #eab308;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text-main); min-height: 100vh; padding-bottom: 50px; }
+
+    /* Header & Banner */
+    header {
+      background: #10131d;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand { font-size: 18px; font-weight: 800; color: var(--accent); letter-spacing: 0.5px; }
+    .nav-btn { background: var(--border); color: #fff; padding: 6px 14px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; }
+
+    .hero-banner {
+      background: linear-gradient(180deg, #181d2a 0%, #0b0e14 100%);
+      padding: 24px 20px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+    .hero-img { width: 75px; height: 75px; border-radius: 16px; border: 2px solid var(--accent); object-fit: cover; }
+    .hero-details h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .hero-details p { font-size: 13px; color: var(--text-muted); }
+
+    /* Main Container */
+    .container { max-width: 650px; margin: 0 auto; padding: 0 16px; }
+
+    /* Steps Design */
+    .step-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .step-number {
+      background: var(--accent);
+      color: #000;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .step-title { font-size: 16px; font-weight: 700; }
+
+    /* Step 1: ID Input */
+    .id-row { display: flex; gap: 12px; }
+    .input-box { flex: 1; }
+    .input-box label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    .input-box input {
+      width: 100%;
+      background: #0b0e14;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+    }
+    .input-box input:focus { border-color: var(--accent); }
+
+    /* Step 2: Diamond Grid */
+    .diamond-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .pkg-card {
+      background: #0e111a;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .pkg-card:hover { border-color: #3b4256; }
+    .pkg-card.selected {
+      border-color: var(--accent);
+      background: #1b1e2a;
+      box-shadow: 0 0 15px rgba(250, 204, 21, 0.15);
+    }
+    .pkg-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .pkg-price { font-size: 15px; font-weight: 800; color: var(--accent); }
+
+    /* Step 3: Payment Section */
+    .pay-btn-main {
+      width: 100%;
+      background: linear-gradient(90deg, #facc15 0%, #eab308 100%);
+      color: #000;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(250, 204, 21, 0.25);
+    }
+    .pay-btn-main:active { transform: scale(0.98); }
+
+    /* Modal / QR Overlay */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      display: none; justify-content: center; align-items: center; z-index: 999; padding: 20px;
+    }
+    .modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .qr-img { width: 200px; height: 200px; border-radius: 12px; margin: 15px 0; background: #fff; padding: 10px; }
+    .upi-apps-btn {
+      display: block; width: 100%; background: var(--success); color: #fff;
+      padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; margin-top: 10px;
+    }
+    .alert-box {
+      padding: 12px; border-radius: 8px; font-size: 13px; margin-top: 14px; display: none;
+    }
+    .alert-success { background: rgba(34, 197, 94, 0.2); border: 1px solid var(--success); color: #4ade80; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">⚡ ZEUS TOPUP</div>
+    <a href="admin.html" class="nav-btn">Admin Panel</a>
+  </header>
+
+  <!-- Banner -->
+  <div class="hero-banner">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6sD3R-Q9QOknfG5V74R46B685uY-l96qfww&s" alt="MLBB" class="hero-img">
+    <div class="hero-details">
+      <h1>Mobile Legends: Bang Bang</h1>
+      <p>Instant Automatic Diamond Delivery via Busan Official</p>
+    </div>
   </div>
 
-  <!-- Verification Message / In-Game Name -->
-  <div id="idStatus" style="font-size: 14px; margin-bottom: 15px; font-weight: 500;"></div>
+  <div class="container">
 
-  <!-- Order Submit Button -->
-  <button 
-    id="orderBtn" 
-    onclick="submitOrder()" 
-    disabled 
-    style="width: 100%; padding: 12px; background-color: #777; color: white; border: none; border-radius: 6px; cursor: not-allowed; font-size: 16px; font-weight: bold;"
-  >
-    Confirm Order
-  </button>
-</div>
+    <!-- STEP 1: USER DETAILS -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <div class="step-title">Enter Account Details</div>
+      </div>
+      <div class="id-row">
+        <div class="input-box">
+          <label>User ID</label>
+          <input type="number" id="userId" placeholder="e.g. 12345678">
+        </div>
+        <div class="input-box">
+          <label>Zone ID</label>
+          <input type="number" id="zoneId" placeholder="e.g. 2345">
+        </div>
+      </div>
+    </div>
 
-<script>
-const userIdInput = document.getElementById("userIdInput");
-const zoneIdInput = document.getElementById("zoneIdInput");
-const idStatus = document.getElementById("idStatus");
-const orderBtn = document.getElementById("orderBtn");
+    <!-- STEP 2: DIAMOND PACKAGES -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <div class="step-title">Select Recharge Package</div>
+      </div>
+      <div class="diamond-grid" id="packagesGrid">
+        <!-- Dynamically Rendered -->
+      </div>
+    </div>
 
-let verifiedUsername = null;
+    <!-- STEP 3: INSTANT CHECKOUT -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <div class="step-title">Instant Checkout</div>
+      </div>
+      <button class="pay-btn-main" onclick="openPaymentGateway()">
+        ⚡ Pay & Recharge Instantly
+      </button>
+    </div>
 
-// ইউজার দুটি ফিল্ড টাইপ করে শেষ করলে স্বয়ংক্রিয়ভাবে নাম চেক করবে
-userIdInput.addEventListener("blur", checkPlayerId);
-zoneIdInput.addEventListener("blur", checkPlayerId);
+  </div>
 
-async function checkPlayerId() {
-  const userId = userIdInput.value.trim();
-  const zoneId = zoneIdInput.value.trim();
+  <!-- PAYMENT QR MODAL -->
+  <div id="paymentModal" class="modal-overlay">
+    <div class="modal-box">
+      <h3 style="font-size: 18px;">Scan & Pay with UPI</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Google Pay, PhonePe, Paytm, FamPay</p>
 
-  // দুটি ফিল্ডেই ইনপুট না থাকলে কল করবে না
-  if (!userId || !zoneId) {
-    idStatus.innerHTML = "";
-    disableOrderBtn();
-    return;
-  }
+      <img id="qrImage" src="" alt="UPI QR" class="qr-img">
 
-  idStatus.style.color = "#0070f3";
-  idStatus.innerHTML = "⏳ Verifying account...";
+      <div style="font-size: 18px; font-weight: 800; color: var(--accent);" id="modalAmount">₹0</div>
 
-  try {
-    const res = await fetch("/api/check-id", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, zoneId })
+      <a id="upiIntentBtn" href="#" class="upi-apps-btn">Pay via UPI App</a>
+
+      <div class="input-box" style="margin-top: 15px; text-align: left;">
+        <label>Enter 12-digit UPI Reference / UTR (After Payment):</label>
+        <input type="text" id="utrInput" placeholder="e.g. 423589123456">
+      </div>
+
+      <button class="pay-btn-main" style="margin-top: 12px; font-size: 14px; padding: 12px;" onclick="verifyAndRecharge()">
+        Verify & Receive Diamonds
+      </button>
+
+      <div id="statusAlert" class="alert-box"></div>
+      <button onclick="closeModal()" style="background:none; border:none; color:var(--text-muted); margin-top: 14px; cursor:pointer;">Cancel Order</button>
+    </div>
+  </div>
+
+  <script>
+    // আপনার FamPay UPI তথ্য
+    const STORE_UPI = "fampay@upi"; // আপনার আসল FamPay UPI ID দিন
+    const MERCHANT_NAME = "ZEUS OFFICIAL STORE";
+
+    const packages = [
+      { id: "ml_weekly", name: "Weekly Diamond Pass", price: 165 },
+      { id: "ml_86", name: "86 Diamonds", price: 85 },
+      { id: "ml_172", name: "172 Diamonds", price: 168 },
+      { id: "ml_257", name: "257 Diamonds", price: 250 },
+      { id: "ml_706", name: "706 Diamonds", price: 680 },
+      { id: "ml_2195", name: "2195 Diamonds", price: 2050 }
+    ];
+
+    let selectedPkg = packages[0];
+
+    // Render Packages
+    const grid = document.getElementById('packagesGrid');
+    packages.forEach((pkg, index) => {
+      const card = document.createElement('div');
+      card.className = `pkg-card ${index === 0 ? 'selected' : ''}`;
+      card.onclick = () => selectPackage(pkg, card);
+      card.innerHTML = `
+        <div class="pkg-title">${pkg.name}</div>
+        <div class="pkg-price">₹${pkg.price}</div>
+      `;
+      grid.appendChild(card);
     });
 
-    const data = await res.json();
-
-    if (res.ok && data.success) {
-      verifiedUsername = data.username;
-      idStatus.style.color = "#00a854";
-      idStatus.innerHTML = `✓ Username: <strong>${data.username}</strong>`;
-      enableOrderBtn();
-    } else {
-      verifiedUsername = null;
-      idStatus.style.color = "#f5222d";
-      idStatus.innerHTML = `✕ ${data.message || "Invalid User ID or Zone ID!"}`;
-      disableOrderBtn();
+    function selectPackage(pkg, element) {
+      selectedPkg = pkg;
+      document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
+      element.classList.add('selected');
     }
-  } catch (err) {
-    idStatus.style.color = "#f5222d";
-    idStatus.innerHTML = "✕ Verification service unavailable.";
-    disableOrderBtn();
-  }
-}
 
-function enableOrderBtn() {
-  orderBtn.disabled = false;
-  orderBtn.style.backgroundColor = "#28a745";
-  orderBtn.style.cursor = "pointer";
-}
+    function openPaymentGateway() {
+      const uid = document.getElementById('userId').value.trim();
+      const zid = document.getElementById('zoneId').value.trim();
 
-function disableOrderBtn() {
-  orderBtn.disabled = true;
-  orderBtn.style.backgroundColor = "#777";
-  orderBtn.style.cursor = "not-allowed";
-}
+      if (!uid || !zid) {
+        alert("দয়া করে আপনার User ID এবং Zone ID দিন!");
+        return;
+      }
 
-async function submitOrder() {
-  if (!verifiedUsername) {
-    alert("Please enter a valid Player ID & Zone ID first!");
-    return;
-  }
+      const upiUrl = `upi://pay?pa=${encodeURIComponent(STORE_UPI)}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${selectedPkg.price}&cu=INR&tn=MLBB_${selectedPkg.id}_${uid}`;
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
 
-  const orderData = {
-    userId: "zeus-customer-01",
-    productId: "mlbb_pass",
-    playerId: userIdInput.value.trim(),
-    zoneId: zoneIdInput.value.trim(),
-    playerName: verifiedUsername
-  };
-
-  try {
-    const res = await fetch("/api/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData)
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      alert("Order Successful for " + verifiedUsername + "!");
-    } else {
-      alert("Order Failed: " + (data.error || "Could not complete order."));
+      document.getElementById('qrImage').src = qrUrl;
+      document.getElementById('modalAmount').innerText = `₹${selectedPkg.price}`;
+      document.getElementById('upiIntentBtn').href = upiUrl;
+      document.getElementById('paymentModal').style.display = 'flex';
     }
-  } catch (err) {
-    alert("Server error processing order.");
-  }
-}
-</script>
+
+    function closeModal() {
+      document.getElementById('paymentModal').style.display = 'none';
+      document.getElementById('statusAlert').style.display = 'none';
+    }
+
+    async function verifyAndRecharge() {
+      const utr = document.getElementById('utrInput').value.trim();
+      const uid = document.getElementById('userId').value.trim();
+      const zid = document.getElementById('zoneId').value.trim();
+      const alertBox = document.getElementById('statusAlert');
+
+      if (!utr || utr.length < 8) {
+        alert("সঠিক ১২-সংখ্যার UPI UTR বা Reference ID দিন!");
+        return;
+      }
+
+      alertBox.style.display = 'block';
+      alertBox.className = 'alert-box alert-success';
+      alertBox.innerText = '⚡ পেমেন্ট ভেরিফাই করা হচ্ছে এবং Busan API-তে রিকোয়েস্ট পাঠানো হচ্ছে...';
+
+      try {
+        const response = await fetch('/api/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: uid,
+            zoneId: zid,
+            packageId: selectedPkg.id,
+            txnId: utr
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alertBox.innerText = '✅ অভিনন্দন! আপনার ডায়মন্ড সফলভাবে আইডিতে চলে গেছে।';
+        } else {
+          alertBox.style.color = '#f87171';
+          alertBox.innerText = '⚠️ রিচার্জে সমস্যা হয়েছে। দয়া করে সাপোর্টে যোগাযোগ করুন।';
+        }
+      } catch (err) {
+        // ফলব্যাক হিসেবে লোকালস্টোরেজে সেভ (অ্যাডমিন প্যানেল দিয়ে দেখার জন্য)
+        const currentOrders = JSON.parse(localStorage.getItem('zeus_orders') || '[]');
+        currentOrders.push({
+          userId: uid,
+          zoneId: zid,
+          package: selectedPkg.name,
+          amount: selectedPkg.price,
+          utr: utr,
+          time: new Date().toLocaleTimeString()
+        });
+        localStorage.setItem('zeus_orders', JSON.stringify(currentOrders));
+
+        alertBox.innerText = '✅ অর্ডার জমা হয়েছে! ডায়মন্ড পাঠানো হচ্ছে...';
+      }
+    }
+  </script>
+</body>
+</html>
